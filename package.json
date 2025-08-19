@@ -1,0 +1,45 @@
+{
+  "name": "cap-node",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@sap/cds": "^9",
+    "express": "^4",
+    "@sap/xssec": "^4",
+    "@cap-js/hana": "^2"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2",
+    "@cap-js/cds-types": "^0.11.0"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "sapux": ["app/admin-books", "app/browse"],
+  "cds": {
+    "requires": {
+      "[development]": {
+        "auth": {
+          "kind": "mocked",
+          "users": {
+            "admin": {
+              "password": "admin",
+              "roles": ["admin"]
+            }
+          }
+        }
+      },
+      "[production]": {
+        "auth": "xsuaa",
+        "db": "hana"
+      },
+      "connectivity": true,
+      "destinations": true,
+      "html5-runtime": true
+    }
+  }
+}

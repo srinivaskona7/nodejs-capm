@@ -1,0 +1,9 @@
+{
+    "actions": [
+        {
+            "id": "openReadmeFile",
+            "actionType": "FILE",
+            "uri": "file:///Users/sr20536224wipro.com/Documents/cap-new/cap-node/.gen/generation.log"
+        }
+    ]
+}

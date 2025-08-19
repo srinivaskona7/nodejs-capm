@@ -1,0 +1,141 @@
+# yaml-language-server: $schema=./values.schema.json
+
+global:
+  domain: abc.com
+  imagePullSecret:
+    name: docker-registry
+  image:
+    registry: registry-server
+    tag: latest
+srv:
+  bindings:
+    auth:
+      serviceInstanceName: xsuaa
+    db:
+      serviceInstanceName: hana
+    destination:
+      serviceInstanceName: destination
+  image:
+    repository: cap-node-srv
+  resources:
+    limits:
+      ephemeral-storage: 1G
+      memory: 500M
+    requests:
+      ephemeral-storage: 1G
+      cpu: 500m
+      memory: 500M
+  health:
+    liveness:
+      path: /health
+    readiness:
+      path: /health
+  expose:
+    enabled: false
+  networkSecurity:
+    allowNamespaceInternal: true
+  additionalVolumes:
+    - name: connectivity-secret
+      volumeMount:
+        mountPath: /bindings/connectivity
+        readOnly: true
+      projected:
+        sources:
+          - secret:
+              name: <your-connectivity-binding>
+              optional: false
+          - secret:
+              name: <your-connectivity-binding>
+              optional: false
+              items:
+                - key: token_service_url
+                  path: url
+          - configMap:
+              name: "{{ .Release.Name }}-connectivity-proxy-info"
+              optional: false
+xsuaa:
+  serviceOfferingName: xsuaa
+  servicePlanName: application
+  parameters:
+    tenant-mode: dedicated
+    oauth2-configuration:
+      redirect-uris:
+        - https://*.{{ tpl .Values.global.domain . }}/**
+    xsappname: cap-node-{{ .Release.Namespace }}
+hana-deployer:
+  image:
+    repository: cap-node-hana-deployer
+  bindings:
+    hana:
+      serviceInstanceName: hana
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 1G
+    requests:
+      cpu: 1000m
+      memory: 1G
+hana:
+  serviceOfferingName: hana
+  servicePlanName: hdi-shared
+approuter:
+  image:
+    repository: cap-node-approuter
+  resources:
+    limits:
+      ephemeral-storage: 1G
+      memory: 500M
+    requests:
+      ephemeral-storage: 1G
+      cpu: 500m
+      memory: 500M
+  health:
+    liveness:
+      path: /
+    readiness:
+      path: /
+  envFrom:
+    - configMapRef:
+        name: "{{ .Release.Name }}-approuter-configmap"
+  bindings:
+    auth:
+      serviceInstanceName: xsuaa
+    html5-apps-repo-runtime:
+      serviceInstanceName: html5-apps-repo-runtime
+backendDestinations:
+  srv-api:
+    service: srv
+destination:
+  serviceOfferingName: destination
+  servicePlanName: lite
+  parameters:
+    version: 1.0.0
+    HTML5Runtime_enabled: true
+html5-apps-repo-host:
+  serviceOfferingName: html5-apps-repo
+  servicePlanName: app-host
+html5-apps-deployer:
+  env:
+    SAP_CLOUD_SERVICE: capnode.service
+  image:
+    repository: cap-node-html5-deployer
+  bindings:
+    xsuaa:
+      serviceInstanceName: xsuaa
+    destination:
+      serviceInstanceName: destination
+    html5-apps-repo:
+      serviceInstanceName: html5-apps-repo-host
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 1G
+    requests:
+      cpu: 1000m
+      memory: 1G
+  envFrom:
+    - configMapRef:
+        name: "{{ .Release.Name }}-html5-apps-deployer-configmap"
+html5-apps-repo-runtime:
+  serviceOfferingName: html5-apps-repo
+  servicePlanName: app-runtime
