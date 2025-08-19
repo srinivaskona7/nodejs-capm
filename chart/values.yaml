@@ -1,11 +1,12 @@
 # yaml-language-server: $schema=./values.schema.json
 
 global:
-  domain: abc.com
+  domain: c-663907f.kyma.ondemand.com
   imagePullSecret:
     name: docker-registry
   image:
-    registry: registry-server
+    registry: docker.io
+    repository: sriniv7654/cap-node
     tag: latest
 srv:
   bindings:
@@ -16,7 +17,7 @@ srv:
     destination:
       serviceInstanceName: destination
   image:
-    repository: cap-node-srv
+    repository: sriniv7654/cap-node-srv
   resources:
     limits:
       ephemeral-storage: 1G
@@ -60,11 +61,11 @@ xsuaa:
     tenant-mode: dedicated
     oauth2-configuration:
       redirect-uris:
-        - https://*.{{ tpl .Values.global.domain . }}/**
+        - https://cap-node-approuter-default.c-663907f.kyma.ondemand.com/**
     xsappname: cap-node-{{ .Release.Namespace }}
 hana-deployer:
   image:
-    repository: cap-node-hana-deployer
+    repository: sriniv7654/cap-node-hana-deployer
   bindings:
     hana:
       serviceInstanceName: hana
@@ -80,7 +81,7 @@ hana:
   servicePlanName: hdi-shared
 approuter:
   image:
-    repository: cap-node-approuter
+    repository: sriniv7654/cap-node-approuter
   resources:
     limits:
       ephemeral-storage: 1G
@@ -118,7 +119,7 @@ html5-apps-deployer:
   env:
     SAP_CLOUD_SERVICE: capnode.service
   image:
-    repository: cap-node-html5-deployer
+    repository: sriniv7654/cap-node-html5-deployer
   bindings:
     xsuaa:
       serviceInstanceName: xsuaa
