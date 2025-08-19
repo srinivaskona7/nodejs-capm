@@ -1,5 +1,5 @@
 _schema-version: '1.0'
-repository: registry-server
+repository: docker.io/sriniv7654
 tag: latest
 before-all:
   - npx cds build --production
