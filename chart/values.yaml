@@ -35,25 +35,6 @@ srv:
     enabled: false
   networkSecurity:
     allowNamespaceInternal: true
-  additionalVolumes:
-    - name: connectivity-secret
-      volumeMount:
-        mountPath: /bindings/connectivity
-        readOnly: true
-      projected:
-        sources:
-          - secret:
-              name: <your-connectivity-binding>
-              optional: false
-          - secret:
-              name: <your-connectivity-binding>
-              optional: false
-              items:
-                - key: token_service_url
-                  path: url
-          - configMap:
-              name: "{{ .Release.Name }}-connectivity-proxy-info"
-              optional: false
 xsuaa:
   serviceOfferingName: xsuaa
   servicePlanName: application
